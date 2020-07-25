@@ -3,14 +3,16 @@ package kapadokia.nyandoro.dating.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable {
+
+public class User implements Parcelable{
+
     private String profile_image;
     private String name;
     private String gender;
     private String interested_in;
     private String status;
 
-    public User(){}
+
     public User(String profile_image, String name, String gender, String interested_in, String status) {
         this.profile_image = profile_image;
         this.name = name;
@@ -18,6 +20,11 @@ public class User implements Parcelable {
         this.interested_in = interested_in;
         this.status = status;
     }
+
+    public User() {
+
+    }
+
 
     protected User(Parcel in) {
         profile_image = in.readString();
@@ -79,17 +86,18 @@ public class User implements Parcelable {
         this.status = status;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(profile_image);
-        dest.writeString(name);
-        dest.writeString(gender);
-        dest.writeString(interested_in);
-        dest.writeString(status);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(profile_image);
+        parcel.writeString(name);
+        parcel.writeString(gender);
+        parcel.writeString(interested_in);
+        parcel.writeString(status);
     }
 }
