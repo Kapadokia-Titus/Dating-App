@@ -1,7 +1,9 @@
 package kapadokia.nyandoro.dating;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +17,18 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.like.LikeButton;
+import com.like.OnLikeListener;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import kapadokia.nyandoro.dating.models.User;
+import kapadokia.nyandoro.dating.util.PreferenceKeys;
 import kapadokia.nyandoro.dating.util.Resources;
 
 
-public class ViewProfileFragment extends Fragment {
+public class ViewProfileFragment extends Fragment implements OnLikeListener {
 
     private static final String TAG = "ViewProfileFragment";
 
@@ -60,7 +67,9 @@ public class ViewProfileFragment extends Fragment {
         mLikeButton = view.findViewById(R.id.heart_button);
         mStatus = view.findViewById(R.id.status);
 
+        mLikeButton.setOnLikeListener(this);
         setBackgroundImage(view);
+        checkIfConnected();
 
         init();
         return view;
@@ -86,6 +95,47 @@ public class ViewProfileFragment extends Fragment {
                 .load(mUser.getProfile_image())
                 .centerCrop()
                 .into(backgroundImage);
+    }
+    // checking if the user is connected
+    private void checkIfConnected(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+
+        Set<String> savedNames = preferences.getStringSet(PreferenceKeys.SAVED_CONNECTIONS, new HashSet<String>());
+
+        if (savedNames.contains(mUser.getName())){
+            mLikeButton.setLiked(true);
+        }else {
+            mLikeButton.setLiked(false);
+        }
+    }
+
+    @Override
+    public void liked(LikeButton likeButton) {
+        Log.d(TAG, "liked: Liked:)");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        Set<String> savedNames = preferences.getStringSet(PreferenceKeys.SAVED_CONNECTIONS, new HashSet<String>());
+        savedNames.add(mUser.getName());
+
+        editor.putStringSet(PreferenceKeys.SAVED_CONNECTIONS,savedNames);
+        editor.commit();
+    }
+
+    @Override
+    public void unLiked(LikeButton likeButton) {
+        Log.d(TAG, "unLiked: (:");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        Set<String> savedNames = preferences.getStringSet(PreferenceKeys.SAVED_CONNECTIONS, new HashSet<String>());
+        savedNames.remove(mUser.getName());
+        editor.remove(PreferenceKeys.SAVED_CONNECTIONS);
+        editor.commit();
+
+        editor.putStringSet(PreferenceKeys.SAVED_CONNECTIONS,savedNames);
+        editor.commit();
     }
 }
 
