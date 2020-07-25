@@ -15,6 +15,12 @@
             android:id="@+id/relLayout1"
             android:layout_above="@+id/relLayout2">
 
+            <androidx.viewpager.widget.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/view_pager_container">
+
+            </androidx.viewpager.widget.ViewPager>
 
 
 
@@ -31,6 +37,11 @@
                 android:layout_height="wrap_content">
 
 
+                <com.google.android.material.tabs.TabLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:id="@+id/tabs_bottom"
+                    android:background="#ffffff"/>
 
             </com.google.android.material.appbar.AppBarLayout>
 
