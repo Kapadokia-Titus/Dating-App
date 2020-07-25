@@ -51,6 +51,7 @@ public class AgreementFragment extends Fragment implements View.OnClickListener{
 
         initToolbar();
         setBackgroundImage(view);
+        mBackArrow.setOnClickListener(this);
 
         return view;
     }
@@ -76,7 +77,7 @@ public class AgreementFragment extends Fragment implements View.OnClickListener{
 
         if(view.getId() == R.id.back_arrow){
             Log.d(TAG, "onClick: navigating back.");
-
+            mInterface.onBackPressed();
         }
     }
 
@@ -86,5 +87,10 @@ public class AgreementFragment extends Fragment implements View.OnClickListener{
         mInterface = (IMainActivity) getActivity();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called.");
+    }
 
 }

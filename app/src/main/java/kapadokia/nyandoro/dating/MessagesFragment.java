@@ -15,6 +15,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,11 +26,12 @@ import kapadokia.nyandoro.dating.util.PreferenceKeys;
 import kapadokia.nyandoro.dating.util.Users;
 
 
-public class MessagesFragment extends Fragment {
+public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static final String TAG = "MessagesFragment";
 
     //widgets
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private MessagesRecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView mRecyclerView;
     private SearchView mSearchView;
@@ -45,6 +47,7 @@ public class MessagesFragment extends Fragment {
         Log.d(TAG, "onCreateView: started.");
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mSearchView = (SearchView) view.findViewById(R.id.action_search);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         getConnections();
         initSearchView();
@@ -102,7 +105,22 @@ public class MessagesFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    @Override
+    public void onRefresh() {
+        getConnections();
+        onItemsLoadComplete();
+    }
 
+    void onItemsLoadComplete() {
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called.");
+    }
 
 
 }

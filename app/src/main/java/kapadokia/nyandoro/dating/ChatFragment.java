@@ -75,6 +75,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
         mSendMessage.setOnClickListener(this);
         mRelativeLayoutTop.setOnClickListener(this);
+        mBackArrow.setOnClickListener(this);
 
         initToolbar();
         initRecyclerView();
@@ -98,11 +99,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 .into(backgroundView);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mInterface = (IMainActivity) getActivity();
-    }
 
     private void getSavedPreferences(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -123,7 +119,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
         if(view.getId() == R.id.back_arrow){
             Log.d(TAG, "onClick: navigating back.");
-
+            mInterface.onBackPressed();
         }
         if(view.getId() == R.id.post_message){
             Log.d(TAG, "onClick: posting new message.");
@@ -149,6 +145,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 .into(mProfileImage);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called.");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mInterface = (IMainActivity) getActivity();
+    }
 
 }
 

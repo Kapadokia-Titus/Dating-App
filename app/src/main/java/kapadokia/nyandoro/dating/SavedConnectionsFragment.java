@@ -1,4 +1,4 @@
-package  kapadokia.nyandoro.dating;
+package kapadokia.nyandoro.dating;
 
 
 import android.content.SharedPreferences;
@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ import kapadokia.nyandoro.dating.util.PreferenceKeys;
 import kapadokia.nyandoro.dating.util.Users;
 
 
-public class SavedConnectionsFragment extends Fragment {
+public class SavedConnectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static final String TAG = "SavedConnFragment";
 
@@ -32,7 +33,7 @@ public class SavedConnectionsFragment extends Fragment {
     private static final int NUM_GRID_COLUMNS = 2;
 
     //widgets
-
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private MainRecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView mRecyclerView;
 
@@ -44,9 +45,10 @@ public class SavedConnectionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_saved_connections, container, false);
         Log.d(TAG, "onCreateView: started.");
-
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         mRecyclerView = view.findViewById(R.id.recycler_view);
 
+        mSwipeRefreshLayout.setOnRefreshListener(this);
         getConnections();
 
         return view;
@@ -78,6 +80,21 @@ public class SavedConnectionsFragment extends Fragment {
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
     }
 
+    @Override
+    public void onRefresh() {
+        getConnections();
+        onItemsLoadComplete();
+    }
 
+    void onItemsLoadComplete() {
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called.");
+    }
 
 }

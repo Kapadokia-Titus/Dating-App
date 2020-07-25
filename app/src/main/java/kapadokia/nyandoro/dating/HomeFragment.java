@@ -1,63 +1,129 @@
 package kapadokia.nyandoro.dating;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import java.util.ArrayList;
 
 import kapadokia.nyandoro.dating.models.User;
+import kapadokia.nyandoro.dating.util.PreferenceKeys;
 import kapadokia.nyandoro.dating.util.Users;
 
-public class HomeFragment extends Fragment {
+
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "HomeFragment";
+
+    //constants
     private static final int NUM_COLUMNS = 2;
 
-    private RecyclerView recyclerView;
+    //widgets
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    // vars
+    //vars
     private ArrayList<User> mMatches = new ArrayList<>();
-    private StaggeredGridLayoutManager staggeredGridLayoutManager;
-    private MainRecyclerViewAdapter mainRecyclerViewAdapter;
+    private StaggeredGridLayoutManager mStaggeredGridLayoutManager;
+    private MainRecyclerViewAdapter mRecyclerViewAdapter;
+    private String mSelectedInterest;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        Log.d(TAG, "onCreateView: started.");
+        mRecyclerView = view.findViewById(R.id.recycler_view);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
-        View view = inflater.inflate(R.layout.fragment_home, container,false);
-        Log.d(TAG, "onCreateView: started");
-
-        recyclerView = view.findViewById(R.id.recycler_view);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
         findMatches();
+
         return view;
     }
 
-    private void findMatches(){
-        Users users  = new Users();
-        if (mMatches!=null){
+    private void findMatches() {
+        getSavedPreferences();
+        Users users = new Users();
+        if(mMatches != null){
             mMatches.clear();
         }
-        for (User user:users.USERS){
-            mMatches.add(user);
+        for(User user: users.USERS){
+            if(mSelectedInterest.equals(getString(R.string.interested_in_anyone))){
+                mMatches.add(user);
+            }
+            else if(user.getGender().equals(mSelectedInterest) || user.getGender().equals(getString(R.string.gender_none))){
+                Log.d(TAG, "findMatches: found a match: " + user.getName());
+                mMatches.add(user);
+            }
         }
-        if (mainRecyclerViewAdapter==null){
-            initRecyclerview();
+        if(mRecyclerViewAdapter == null){
+            initRecyclerView();
         }
     }
 
-    private void initRecyclerview() {
-        Log.d(TAG, "initRecyclerview: init recyclerview");
-        staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mainRecyclerViewAdapter = new MainRecyclerViewAdapter(getActivity(), mMatches);
-        recyclerView.setAdapter(mainRecyclerViewAdapter);
+    private void getSavedPreferences(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mSelectedInterest = preferences.getString(PreferenceKeys.INTERESTED_IN, getString(R.string.interested_in_anyone));
+        Log.d(TAG, "getSavedPreferences: got selected interest: " + mSelectedInterest);
+    }
+
+    private void initRecyclerView(){
+        Log.d(TAG, "initRecyclerView: init recyclerview.");
+        mStaggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
+        mRecyclerViewAdapter = new MainRecyclerViewAdapter(getActivity(), mMatches);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+    }
+
+    public void scrollToTop(){
+        mRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called.");
+    }
+
+    @Override
+    public void onRefresh() {
+        findMatches();
+        onItemsLoadComplete();
+    }
+
+    void onItemsLoadComplete() {
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
