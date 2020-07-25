@@ -3,6 +3,8 @@ package kapadokia.nyandoro.dating;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -13,31 +15,79 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import kapadokia.nyandoro.dating.models.Message;
 import kapadokia.nyandoro.dating.models.User;
+import kapadokia.nyandoro.dating.settings.SettingsFragment;
 import kapadokia.nyandoro.dating.util.PreferenceKeys;
 
-public class MainActivity extends AppCompatActivity implements IMainActivity, BottomNavigationViewEx.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements IMainActivity,
+        BottomNavigationViewEx.OnNavigationItemSelectedListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
     private BottomNavigationViewEx bottomNavigationViewEx;
+    private ImageView mHeaderImage;
+    private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationViewEx = findViewById(R.id.bottom_nav_view);
         bottomNavigationViewEx.setOnNavigationItemSelectedListener(this);
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View headerView  = navigationView.getHeaderView(0);
+        mHeaderImage = headerView.findViewById(R.id.header_image);
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+        // method calls
         isFirstLoggedIn();
         init();
+        setHeaderImage();
         initBottomNavigationView();
+        createNavigationViewListener();
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
 
+            case R.id.home:{
+                init();
+                break;
+            }
+            case R.id.settings:{
+                Log.d(TAG, "onNavigationItemSelected: Settings");
+                SettingsFragment fragment = new SettingsFragment();
+                // using fragment transaction to inflate the transactions
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                transaction.replace(R.id.main_content_frame, fragment, getString(R.string.tag_fragment_settings));
+                // add the fragment to the backstack
+                transaction.addToBackStack(getString(R.string.tag_fragment_settings));
+                //commit the transaction
+                transaction.commit();
+                break;
+            }
+            case R.id.agreement:{
+                Log.d(TAG, "onNavigationItemSelected: Agreement");
+                AgreementFragment fragment = new AgreementFragment();
+                // using fragment transaction to inflate the transactions
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                transaction.replace(R.id.main_content_frame, fragment, getString(R.string.tag_fragment_agreement));
+                // add the fragment to the backstack
+                transaction.addToBackStack(getString(R.string.tag_fragment_agreement));
+                //commit the transaction
+                transaction.commit();
+                break;
+            }
             case R.id.bottom_nav_home:{
                 Log.d(TAG, "onNavigationItemSelected: HomeFragment");
                 HomeFragment fragment = new HomeFragment();
@@ -81,9 +131,15 @@ public class MainActivity extends AppCompatActivity implements IMainActivity, Bo
                 break;
             }
         }
+        drawerLayout.closeDrawer(GravityCompat.START);
         return false;
     }
 
+    private void createNavigationViewListener(){
+        Log.d(TAG, "createNavigationViewListener: initializing navigation drawer listener");
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this );
+    }
     private void initBottomNavigationView(){
         Log.d(TAG, "initBottomNavigationView: initialising bottom navigation view ....");
         bottomNavigationViewEx.enableAnimation(false);
@@ -102,6 +158,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity, Bo
         transaction.commit();
     }
 
+    private void setHeaderImage(){
+        Log.d(TAG, "setmHeaderImage: setting header image for navigation drawer");
+        Glide.with(this)
+                .load(R.drawable.couple)
+                .into(mHeaderImage);
+    }
     private void isFirstLoggedIn(){
         Log.d(TAG, "isFirstLoggedIn: checking if this is the first login");
 

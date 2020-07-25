@@ -21,7 +21,8 @@
         android:id="@+id/navigation_view"
         android:layout_gravity="start"
         android:background="#ffffff"
-        app:menu="@menu/bottom_navigation_drawer_items">
+        app:menu="@menu/bottom_navigation_drawer_items"
+        app:headerLayout="@layout/layout_nav_header">
 
     </com.google.android.material.navigation.NavigationView>
 
