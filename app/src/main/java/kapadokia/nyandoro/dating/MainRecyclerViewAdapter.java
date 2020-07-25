@@ -22,6 +22,7 @@ import kapadokia.nyandoro.dating.models.User;
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "MainRecyclerViewAd";
+    private IMainActivity iMainActivity;
 
     //vars
     private ArrayList<User> mUsers = new ArrayList<>();
@@ -56,14 +57,20 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         holder.name.setText(mUsers.get(position).getName());
         holder.interested_in.setText(mUsers.get(position).getInterested_in());
         holder.status.setText(mUsers.get(position).getStatus());
-
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: clicked");
+                iMainActivity.inflateViewProfileFragment(mUsers.get(position));
+            }
+        });
 
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-
+        iMainActivity = (IMainActivity)mContext;
     }
 
     @Override

@@ -12,9 +12,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import kapadokia.nyandoro.dating.models.User;
 import kapadokia.nyandoro.dating.util.PreferenceKeys;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IMainActivity{
 
     private static final String TAG = "MainActivity";
     @Override
@@ -68,5 +69,22 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+    }
+
+    @Override
+    public void inflateViewProfileFragment(User user) {
+        ViewProfileFragment fragment = new ViewProfileFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(getString(R.string.intent_user), user);
+        fragment.setArguments(args);
+        // using fragment transaction to inflate the transactions
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        transaction.replace(R.id.main_content_frame, fragment, getString(R.string.tag_fragment_view_profile));
+        // add the fragment to the backstack
+        transaction.addToBackStack(getString(R.string.tag_fragment_view_profile));
+        //commit the transaction
+        transaction.commit();
     }
 }

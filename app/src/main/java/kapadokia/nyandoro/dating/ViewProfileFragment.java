@@ -23,14 +23,14 @@ public class ViewProfileFragment extends Fragment {
     //vars
     private User mUser;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle bundle = this.getArguments();
-        if(bundle != null){
+        if (bundle !=null){
             mUser = bundle.getParcelable(getString(R.string.intent_user));
-            Log.d(TAG, "onCreate: got incoming bundle: " + mUser.getName());
+            Log.d(TAG, "onCreate: incoming bundle "+mUser.getName());
         }
     }
 
